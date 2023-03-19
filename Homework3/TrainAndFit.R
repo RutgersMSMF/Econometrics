@@ -3,7 +3,8 @@ library("TSA")
 library("MCS")
 
 # Import Data from CSV File
-data <- read.csv("C:/Users/steve/Documents/GitHub/Econometrics/Homework3/A3.csv")
+# data <- read.csv("C:/Users/steve/Documents/GitHub/Econometrics/Homework3/A3.csv")
+data <- read.csv("C:/Users/18627/Documents/GitHub/Econometrics/Homework3/A3.csv")
 
 y <- data$y
 yTrain <- y[1:900]
@@ -39,7 +40,7 @@ yFalseACF <- Acf(yFalse$residuals)
 yFalsePACF <- Pacf(yFalse$residuals)
 
 # Apply LB.Test()
-LB.test(yFalse, lag = 12)
+print(paste0("Y False: ", LB.test(yFalse, lag = 12)))
 
 # 4. 
 # Solve For ARIMA Process
@@ -50,26 +51,44 @@ yTrueACF <- Acf(yTrue$residuals)
 yTruePACF <- Pacf(yTrue$residuals)
 
 # Apply LB.Test()
-LB.test(yTrue, lag = 12)
+print(paste0("Y True: ", LB.test(yTrue, lag = 12)))
 
 # 5. 
 # Report AIC and BIC 
+print(paste0("AIC: ", AIC(yFalse, yTrue)))
 print(paste0("Y False AIC: ", yFalse$aic))
 print(paste0("Y True AIC: ", yTrue$aic))
 
+print(paste0("BIC: ", BIC(yFalse, yTrue)))
 print(paste0("Y False BIC: ", yFalse$bic))
 print(paste0("Y True BIC: ", yTrue$bic))
 
 # 6. 
 # Forecasting 
 Loss <- matrix(nrow = 100, ncol = 4)
+yTest <- y[901:1000]
 
 for (t in 1:100) {
   
+  arForecast <- predict(arima(yFalse$fitted[1:900 + t - 1], order = c(1, 0, 0)), n.ahead = 1)
+  Loss[t, 1] <- (yTest[t] - arForecast$pred[1])^2
   
+  maForecast <- predict(arima(yFalse$fitted[1:900 + t - 1], order = c(0, 0, 1)), n.ahead = 1)
+  Loss[t, 2] <- (yTest[t] - maForecast$pred[1])^2
   
 }
 
+for (t in 1:100) {
+  
+  arForecast <- predict(arima(yTrue$fitted[1:900 + t - 1], order = c(1, 0, 0)), n.ahead = 1)
+  Loss[t, 3] <- (yTest[t] - arForecast$pred[1])^2
+  
+  maForecast <- predict(arima(yTrue$fitted[1:900 + t - 1], order = c(0, 0, 1)), n.ahead = 1)
+  Loss[t, 4] <- (yTest[t] - maForecast$pred[1])^2
+  
+}
+
+print(paste0("Mean Squared Error: ", colMeans(Loss)))
 optimizationRoutineOne <- MCSprocedure(Loss, alpha = 0.05, B = 5000)
 optimizationRoutineTwo <- MCSprocedure(Loss, alpha = 0.15, B = 5000)
 
