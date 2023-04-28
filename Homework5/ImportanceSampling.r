@@ -49,12 +49,14 @@ RV = rnorm(N)
 
 # Calculate Sample Average of Indicator Function
 NaiveAvg <- indicatorFunction(RV, c)
+NaiveErr <- sd(RV) / sqrt(N)
 
 # Sample From Different Distribution
 RV = rnorm(N, mean = 5, sd = 1)
 
 # Importance Sampling Procedure
 ImportanceSamplingAverage <- importanceSampling(RV, c)
+ImportanceSamplingErr <- sd(RV) / sqrt(N)
 
 ####################
 # A Slightly Harder Task
@@ -62,6 +64,7 @@ ImportanceSamplingAverage <- importanceSampling(RV, c)
 
 harderTask = pnorm(1) - pnorm(-1)
 
+####################
 # Generate Uniform Random Variables 
 U = runif(N, min = -1, max = 1)
 
@@ -75,7 +78,9 @@ for(n in U) {
 }
 
 USamples <- avg / length(U)
+####################
 
+####################
 # Generate Normal Random Variables
 N = rnorm(N, mean = 0, sd = 1)
 
@@ -89,7 +94,9 @@ for(n in N) {
 }
 
 NSamples <- avg / length(N)
+####################
 
+####################
 # Generate Cauchy Random Variables
 C = rt(N, df = 1)
 
@@ -103,6 +110,7 @@ for(n in C) {
 }
 
 CSamples <- avg / length(C)
+####################
 
 
 
